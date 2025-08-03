@@ -5,8 +5,8 @@
 // @description Add buttons to download images and videos in Twitter, also does some other enhancements.
 // @match       https://twitter.com/*
 // @match       https://x.com/*
-// @homepageURL https://github.com/AlttiRi/twitter-click-and-save
-// @supportURL  https://github.com/AlttiRi/twitter-click-and-save/issues
+// @homepageURL https://github.com/akiwagashi/twitter-click-and-save
+// @supportURL  https://github.com/akiwagashi/twitter-click-and-save/issues
 // @license     GPL-3.0
 // @grant       GM.registerMenuCommand
 // @icon        https://raw.githubusercontent.com/AlttiRi/twitter-click-and-save/master/x-icon-with-button.png
@@ -17,7 +17,7 @@
 
 
 // Please, report bugs and suggestions on GitHub, not Greasyfork. I rarely visit Greasyfork.
-// --> https://github.com/AlttiRi/twitter-click-and-save/issues <--
+// --> https://github.com/akiwagashi/twitter-click-and-save/issues <--
 
 
 
@@ -126,8 +126,8 @@ const datePattern = "YYYY.MM.DD";
  *
  * Note, that the script updating will overwrite the changes.
  * */
-const imageFilenameTemplate      = `[twitter]{sampleText} {author}—{lastModifiedDate}—{tweetId}—{name}.{extension}`;
-const videoFilenameTemplate      = `[twitter] {author}—{lastModifiedDate}—{tweetId}—{name}.{extension}`;
+const imageFilenameTemplate      = `[twitter]{author}—{lastModifiedDate}—{tweetId}—{name}.{extension}`;
+const videoFilenameTemplate      = `[twitter]{author}—{lastModifiedDate}—{tweetId}—{name}.{extension}`;
 const backgroundFilenameTemplate = `[twitter][bg] {username}—{lastModifiedDate}—{id}—{seconds}.{extension}`;
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -1695,7 +1695,7 @@ function hoistTweet() {
     class Tweet {
         constructor({elem, url}) {
             if (url) {
-                this.elem = null;
+                this.elem = elem;
                 this.url = url;
             } else {
                 this.elem = elem;
@@ -1707,15 +1707,9 @@ function hoistTweet() {
         static of(innerElem) {
             // Workaround for media from a quoted tweet
             const url = innerElem.closest(`a[href^="/"]`)?.href;
-            if (url && url.includes("/status/")) {
-                return new Tweet({url});
-            }
-
-            const elem = innerElem.closest(`[data-testid="tweet"]`);
-            if (!elem) { // === null // opened image or bg image
-                verbose && console.log("[ujs][Tweet.of]", "No-tweet elem");
-            }
-            return new Tweet({elem});
+            const tweetBlock = innerElem.closest('div[class="css-175oi2r r-1iusvr4 r-16y2uox r-1777fci r-kzbkwu"]');
+            const elem = tweetBlock.querySelector('[data-testid="User-Name"]');
+            return new Tweet({elem, url});
         }
 
         static getUrl(elem) {
@@ -1735,7 +1729,10 @@ function hoistTweet() {
         }
 
         get author() {
-            return this.url.match(/(?<=(twitter|x)\.com\/).+?(?=\/)/)?.[0];
+            const authorName = this.elem.querySelector('span[class="css-1jxf684 r-bcqeeo r-1ttztb7 r-qvutc0 r-poiln3"]').innerText;
+            let atIndex = authorName.indexOf("@");
+            if (atIndex === -1) atIndex = name.indexOf("＠");
+            return atIndex === -1 ? authorName : authorName.slice(0,atIndex);
         }
 
         get id() {
