@@ -1707,9 +1707,20 @@ function hoistTweet() {
         static of(innerElem) {
             // Workaround for media from a quoted tweet
             const url = innerElem.closest(`a[href^="/"]`)?.href;
-            const tweetBlock = innerElem.closest('div[class="css-175oi2r r-1iusvr4 r-16y2uox r-1777fci r-kzbkwu"]');
-            const elem = tweetBlock.querySelector('[data-testid="User-Name"]');
-            return new Tweet({elem, url});
+
+            let tweetBlock = null;
+            if(url)
+            {
+                tweetBlock = innerElem.closest('div[class="css-175oi2r r-1iusvr4 r-16y2uox r-1777fci r-kzbkwu"]');
+            }
+            else    //op image
+            {
+                tweetBlock = innerElem.closest('div[class="css-175oi2r r-18u37iz r-1pi2tsx r-11yh6sk r-buy8e9 r-bnwqim r-13qz1uu"]');
+            }
+
+            const userElem = tweetBlock.querySelector('[data-testid="User-Name"]');
+
+            return new Tweet({elem : userElem, url});
         }
 
         static getUrl(elem) {
@@ -1731,7 +1742,7 @@ function hoistTweet() {
         get author() {
             const authorName = this.elem.querySelector('span[class="css-1jxf684 r-bcqeeo r-1ttztb7 r-qvutc0 r-poiln3"]').innerText;
             let atIndex = authorName.indexOf("@");
-            if (atIndex === -1) atIndex = name.indexOf("＠");
+            if (atIndex === -1) atIndex = authorName.indexOf("＠");
             return atIndex === -1 ? authorName : authorName.slice(0,atIndex);
         }
 
