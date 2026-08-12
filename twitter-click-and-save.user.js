@@ -1711,14 +1711,14 @@ function hoistTweet() {
             let tweetBlock = null;
             if(url)
             {
-                tweetBlock = innerElem.closest('div[class="css-175oi2r r-1iusvr4 r-16y2uox r-1777fci r-kzbkwu"]');
+                tweetBlock = innerElem.closest('div[class="css-g5y9jx r-16y2uox r-1wbh5a2 r-1ny4l3l"]');
             }
             else    //op image
             {
-                tweetBlock = innerElem.closest('div[class="css-175oi2r r-18u37iz r-1pi2tsx r-11yh6sk r-buy8e9 r-bnwqim r-13qz1uu"]');
+                tweetBlock = innerElem.closest('div[class="css-g5y9jx r-18u37iz r-1pi2tsx r-11yh6sk r-buy8e9 r-bnwqim r-13qz1uu"]');
             }
 
-            const userElem = tweetBlock.querySelector('[data-testid="User-Name"]');
+            const userElem = tweetBlock.querySelector('div[data-testid="User-Name"]');
 
             return new Tweet({elem : userElem, url});
         }
